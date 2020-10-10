@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# run code formatter
+preFormatChanges=$(git status -s -uno | wc -l)
+
+dotnet format --verbosity diagnostic
+
+postFormatChanges=$(git status -s -uno | wc -l)
+
+GREEN='\033[1;32m'
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+
+if [ "$preFormatChanges" -ne "$postFormatChanges" ];
+then 
+    echo "${RED} ${postFormatChanges} extra files changed after formatting code!${NC}";
+else
+    echo "${GREEN}No extra file changes detected after formatting code!${NC}";
+fi;

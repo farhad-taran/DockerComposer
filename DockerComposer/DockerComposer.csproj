@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <PackOnBuild>true</PackOnBuild>
+        <Authors>Farhad Taran</Authors>
+        <PackageProjectUrl>https://github.com/farhad-taran/DockerComposer</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/farhad-taran/DockerComposer</RepositoryUrl>
+        <Description>Run docker containers straight from within integration tests</Description>
+        <PackageVersion>1.0.0</PackageVersion>
+        <RootNamespace>DockerComposer</RootNamespace>
+    </PropertyGroup>
+
+    <Target Name="CopyGitHooks" AfterTargets="BeforeBuild">
+        <ItemGroup>
+            <GIT-HOOKS Include="$(SolutionDir)\scripts\git-hooks\*.*" />
+        </ItemGroup>
+        <Copy SourceFiles="@(GIT-HOOKS)" DestinationFolder="$(SolutionDir)\.git\hooks" SkipUnchangedFiles="true" />
+    </Target>
+
+    <ItemGroup>
+        <PackageReference Include="AWSSDK.Core" Version="3.3.27" />
+        <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.14.5" />
+        <PackageReference Include="Ductus.FluentDocker" Version="2.7.68-beta.146" />
+    </ItemGroup>
+
+</Project>
