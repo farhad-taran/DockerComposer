@@ -29,4 +29,5 @@ jobs:
             dotnet pack --configuration Release
             dotnet tool install --global gpr --version 0.1.224
             $HOME/.dotnet/tools/gpr push **/*.nupkg -k ${{ github.token }}
+            dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
 
