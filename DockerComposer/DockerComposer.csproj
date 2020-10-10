@@ -7,7 +7,7 @@
         <PackageProjectUrl>https://github.com/farhad-taran/DockerComposer</PackageProjectUrl>
         <RepositoryUrl>https://github.com/farhad-taran/DockerComposer</RepositoryUrl>
         <Description>Run docker-compose containers straight from within integration tests</Description>
-        <PackageVersion>1.0.0.0</PackageVersion>
+        <PackageVersion>1.0.0.2</PackageVersion>
         <RootNamespace>DockerComposer</RootNamespace>
     </PropertyGroup>
 

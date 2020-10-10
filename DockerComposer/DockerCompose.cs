@@ -7,7 +7,7 @@ using Ductus.FluentDocker.Services;
 
 namespace DockerComposer
 {
-    public class DockerComposer : IDisposable
+    public class DockerCompose : IDisposable
     {
         private ICompositeService _compositeService;
         private bool _keepAlive;
@@ -18,7 +18,7 @@ namespace DockerComposer
         private readonly List<(string serviceName, string portAndProto, long timeout, string address)>
             _portHealthChecks;
 
-        private DockerComposer(string dockerComposeFileName)
+        private DockerCompose(string dockerComposeFileName)
         {
             _dockerComposeFileName = dockerComposeFileName;
             _healthChecks = new List<(string serviceName, Func<bool> check)>();
@@ -32,9 +32,9 @@ namespace DockerComposer
         /// </summary>
         /// <param name="fileName"></param>
         /// <returns></returns>
-        public static DockerComposer WithComposeFile(string fileName = "docker-compose.yml")
+        public static DockerCompose WithComposeFile(string fileName = "docker-compose.yml")
         {
-            return new DockerComposer(fileName);
+            return new DockerCompose(fileName);
         }
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace DockerComposer
         /// <param name="serviceName"></param>
         /// <param name="check"></param>
         /// <returns></returns>
-        public DockerComposer WaitForCheck(string serviceName, Func<bool> check)
+        public DockerCompose WaitForCheck(string serviceName, Func<bool> check)
         {
             _healthChecks.Add((serviceName, check));
             return this;
@@ -86,14 +86,14 @@ namespace DockerComposer
             return this;
         }
 
-        public DockerComposer WaitForPort(string service, string portAndProto, long millisTimeout = long.MaxValue,
+        public DockerCompose WaitForPort(string service, string portAndProto, long millisTimeout = long.MaxValue,
             string address = null)
         {
             _portHealthChecks.Add((service, portAndProto, millisTimeout, address));
             return this;
         }
 
-        public DockerComposer WaitForProcess(string service, string process, long millisTimeout = long.MaxValue)
+        public DockerCompose WaitForProcess(string service, string process, long millisTimeout = long.MaxValue)
         {
             _processHealthChecks.Add((service, process, millisTimeout));
             return this;
@@ -124,7 +124,7 @@ namespace DockerComposer
         /// </summary>
         /// <param name="shouldKeepAlive"></param>
         /// <returns></returns>
-        public DockerComposer KeepAliveWhen(Func<bool> shouldKeepAlive)
+        public DockerCompose KeepAliveWhen(Func<bool> shouldKeepAlive)
         {
             _keepAlive = shouldKeepAlive();
             return this;
@@ -137,7 +137,7 @@ namespace DockerComposer
         /// <param name="environmentVariable">environment variable to check for</param>
         /// <param name="environmentVariableCheck">optional check on the value of the environment variable, by default checks that environment variable exists</param>
         /// <returns></returns>
-        public DockerComposer KeepAliveWhen(string environmentVariable, Predicate<string> environmentVariableCheck = null)
+        public DockerCompose KeepAliveWhen(string environmentVariable, Predicate<string> environmentVariableCheck = null)
         {
             var value = Environment.GetEnvironmentVariable(environmentVariable);
             _keepAlive = environmentVariableCheck?.Invoke(value) ?? value != null;
