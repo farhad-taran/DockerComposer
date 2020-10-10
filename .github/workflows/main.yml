@@ -29,6 +29,7 @@ jobs:
       
       - name: Github Package Push
         run: |            
+            dotnet pack --configuration Release
             dotnet tool install --global gpr --version 0.1.224
             $HOME/.dotnet/tools/gpr push **/*.nupkg -k ${{ github.token }}
 
