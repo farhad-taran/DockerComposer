@@ -20,7 +20,7 @@ namespace DockerComposer.Integration.Tests
         [Fact]
         public async Task FullIntegrationTest()
         {
-            using var _ = DockerComposer
+            using var _ = DockerCompose
                 .WithComposeFile("Integration.Tests.Compose.yml")
                 .Up();
 
