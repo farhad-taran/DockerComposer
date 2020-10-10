@@ -10,7 +10,7 @@ namespace DockerComposer
     public class DockerComposer : IDisposable
     {
         private ICompositeService _compositeService;
-        private bool _keepAliveOnLocal;
+        private bool _keepAlive;
         private readonly string _dockerComposeFileName;
         private readonly List<(string serviceName, Func<bool> check)> _healthChecks;
         private readonly List<(string serviceName, string process, long timeout)>
@@ -55,11 +55,6 @@ namespace DockerComposer
         /// <returns></returns>
         public IDisposable Up()
         {
-            if (_healthChecks.Any() && _healthChecks.All(hc => hc.check()))
-            {
-                return this;
-            }
-
             var composeFileLocation = TryGetDockerComposeFilePath(_dockerComposeFileName);
             var builder = new Builder()
                 .UseContainer()
@@ -131,7 +126,7 @@ namespace DockerComposer
         /// <returns></returns>
         public DockerComposer KeepAliveWhen(Func<bool> shouldKeepAlive)
         {
-            _keepAliveOnLocal = shouldKeepAlive();
+            _keepAlive = shouldKeepAlive();
             return this;
         }
 
@@ -145,13 +140,13 @@ namespace DockerComposer
         public DockerComposer KeepAliveWhen(string environmentVariable, Predicate<string> environmentVariableCheck = null)
         {
             var value = Environment.GetEnvironmentVariable(environmentVariable);
-            _keepAliveOnLocal = environmentVariableCheck?.Invoke(value) ?? value != null;
+            _keepAlive = environmentVariableCheck?.Invoke(value) ?? value != null;
             return this;
         }
 
         public void Dispose()
         {
-            if (_keepAliveOnLocal)
+            if (_keepAlive)
             {
                 return;
             }
