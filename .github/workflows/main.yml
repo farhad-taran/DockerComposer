@@ -7,8 +7,6 @@ name: CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -24,8 +22,13 @@ jobs:
       - name: Run tests
         run: dotnet test -l "console;verbosity=detailed"
         
-      - name: NuGet push
+      - name: NuGet Package Push
         run: |
+            dotnet pack --configuration Release
+            dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+      
+      - name: Github Package Push
+        run: |            
             dotnet pack --configuration Release
             dotnet tool install --global gpr --version 0.1.224
             $HOME/.dotnet/tools/gpr push **/*.nupkg -k ${{ github.token }}
