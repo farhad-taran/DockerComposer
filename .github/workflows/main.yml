@@ -24,19 +24,19 @@ jobs:
             
       - name: get commit message
         run: |
-           echo "{commitmsg}={$(git log --format=%B -n 1 ${{ github.event.after }})}" >> $GITHUB_ENV
+           echo "commitmsg=$(git log --format=%B -n 1 ${{ github.event.after }})" >> $GITHUB_ENV
            
       - name: show commit message
         run : echo $commitmsg
         
       - name: NuGet Package Push
-        if: contains( env.commitmsg, 'publish' )
+        if: env.commitmsg == 'publish'
         run: |
             dotnet pack --configuration Release
             dotnet nuget push **/*.nupkg --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
       
       - name: Github Package Push
-        if: contains( env.commitmsg, 'publish' )
+        if: env.commitmsg == 'publish'
         run: |            
             dotnet pack --configuration Release
             dotnet tool install --global gpr --version 0.1.224
