@@ -1,40 +1,46 @@
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
+using Amazon.Runtime;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace DynamoDbLocal.Integration.Tests
+namespace DockerComposer.Integration.Tests
 {
     public class IntegrationTest
     {
-         private readonly ITestOutputHelper _outputHelper;
+        private readonly ITestOutputHelper _outputHelper;
 
         public IntegrationTest(ITestOutputHelper outputHelper)
         {
             _outputHelper = outputHelper;
         }
-        
+
         [Fact]
         public async Task FullIntegrationTest()
         {
-            var localDynamo = new DynamoDb(8001);
+            using var _ = DockerCompose
+                .WithComposeFile("Integration.Tests.Compose.yml")
+                .Up();
 
-            try
-            {
-                localDynamo.Start();
-                await Task.Delay(4000);
-                await CreateTestTable(localDynamo.Client);
+            var client = CreateClient();
+            await CreateTestTable(client);
 
-                var tables = await localDynamo.Client.ListTablesAsync();
-                Assert.True(tables.TableNames.Count == 1, "Wrong number of tables.  Expected 1 but got " + tables.TableNames.Count);
-            }
-            finally
+            var tables = await client.ListTablesAsync();
+
+            Assert.True(tables.TableNames.Count == 1, "Wrong number of tables.  Expected 1 but got " + tables.TableNames.Count);
+        }
+
+        private AmazonDynamoDBClient CreateClient()
+        {
+            var config = new AmazonDynamoDBConfig
             {
-                localDynamo.Stop();
-            }
+                ServiceURL = $"http://localhost:8000"
+            };
+
+            var credentials = new BasicAWSCredentials("accessKey", "secretKey");
+            return new AmazonDynamoDBClient(credentials, config);
         }
 
         private async Task CreateTestTable(IAmazonDynamoDB dynamoClient)
