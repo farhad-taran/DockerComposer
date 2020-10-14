@@ -22,6 +22,8 @@ namespace DockerComposer.Integration.Tests
         {
             using var _ = DockerCompose
                 .WithComposeFile("Integration.Tests.Compose.yml")
+                .ForceBuild()
+                .ForceReCreate()
                 .Up();
 
             var client = CreateClient();
