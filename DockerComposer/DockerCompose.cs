@@ -13,6 +13,7 @@ namespace DockerComposer
         private bool _forceReCreate;
         private bool _forceBuild;
         private bool _keepAlive;
+        private bool _isCorrectEnvironment;
         private readonly string _dockerComposeFileName;
         private readonly List<(string serviceName, Func<bool> check)> _healthChecks;
         private readonly List<(string serviceName, string process, long timeout)>
@@ -37,6 +38,19 @@ namespace DockerComposer
         public static DockerCompose WithComposeFile(string fileName = "docker-compose.yml")
         {
             return new DockerCompose(fileName);
+        }
+        
+        /// <summary>
+        /// Allows to Only use composer when on certain environment
+        /// </summary>
+        /// <param name="environmentVariable">environment variable to check for</param>
+        /// <param name="environmentVariableCheck">optional check on the value of the environment variable, by default checks that environment variable exists</param>
+        /// <returns></returns>
+        public DockerCompose WhenEnvironment(string environmentVariable, Predicate<string> environmentVariableCheck = null)
+        {
+            var value = Environment.GetEnvironmentVariable(environmentVariable);
+            _isCorrectEnvironment = environmentVariableCheck?.Invoke(value) ?? value != null;
+            return this;
         }
 
         /// <summary>
@@ -68,7 +82,7 @@ namespace DockerComposer
             {
                 builder.ForceBuild();
             }
-            
+
             if (_forceReCreate)
             {
                 builder.ForceRecreate();
@@ -103,7 +117,7 @@ namespace DockerComposer
             _forceBuild = true;
             return this;
         }
-        
+
         public DockerCompose ForceReCreate()
         {
             _forceReCreate = true;
