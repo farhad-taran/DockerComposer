@@ -10,6 +10,8 @@ namespace DockerComposer
     public class DockerCompose : IDisposable
     {
         private ICompositeService _compositeService;
+        private bool _forceReCreate;
+        private bool _forceBuild;
         private bool _keepAlive;
         private readonly string _dockerComposeFileName;
         private readonly List<(string serviceName, Func<bool> check)> _healthChecks;
@@ -62,6 +64,16 @@ namespace DockerComposer
                 .FromFile(composeFileLocation)
                 .RemoveOrphans();
 
+            if (_forceBuild)
+            {
+                builder.ForceBuild();
+            }
+            
+            if (_forceReCreate)
+            {
+                builder.ForceRecreate();
+            }
+
             foreach (var healthCheck in _healthChecks)
             {
                 builder.Wait(healthCheck.serviceName,
@@ -83,6 +95,18 @@ namespace DockerComposer
             _compositeService = builder.Build()
                 .Start();
 
+            return this;
+        }
+
+        public DockerCompose ForceBuild()
+        {
+            _forceBuild = true;
+            return this;
+        }
+        
+        public DockerCompose ForceReCreate()
+        {
+            _forceReCreate = true;
             return this;
         }
 
