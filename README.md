@@ -15,3 +15,6 @@ using var _ = DockerComposer.Up();
 All the containers will be killed once the using statement completes but can be kept alive by checking for certain environment variables or using a custom check.
 
 Full example can be viewed [here](./DockerComposer.Integration.Tests/IntegrationTest.cs)
+
+Versions:
+1.0.0.3

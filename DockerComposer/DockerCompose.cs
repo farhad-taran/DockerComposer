@@ -13,7 +13,7 @@ namespace DockerComposer
         private bool _forceReCreate;
         private bool _forceBuild;
         private bool _keepAlive;
-        private bool _isCorrectEnvironment;
+        private bool? _isCorrectEnvironment;
         private readonly string _dockerComposeFileName;
         private readonly List<(string serviceName, Func<bool> check)> _healthChecks;
         private readonly List<(string serviceName, string process, long timeout)>
@@ -71,6 +71,9 @@ namespace DockerComposer
         /// <returns></returns>
         public IDisposable Up()
         {
+            if (_isCorrectEnvironment != null && _isCorrectEnvironment == false)
+                return this;
+            
             var composeFileLocation = TryGetDockerComposeFilePath(_dockerComposeFileName);
             var builder = new Builder()
                 .UseContainer()
